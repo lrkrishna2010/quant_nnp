@@ -1,0 +1,50 @@
+# configs/config.yaml
+# Single source of truth for all hyperparameters and thresholds.
+# Edit here; models import via load_config().
+
+data:
+  start_date: "2002-08-01"
+  end_date:   "2024-12-31"
+  window:     24              # rolling correlation window (months)
+  test_frac:  0.20            # walk-forward test split
+
+dissertation:
+  inflation_threshold: 4.57  # CPI% above which stock-bond beta turns positive (Eq 4.1)
+  beta1: -0.3780              # OLS coefficient on r_stock (Table 4.1)
+  beta2:  0.0828              # OLS coefficient on r_stock × inflation (Table 4.1)
+  sigma_s_2022: 0.168         # annualised stock vol in 2022 (§4.2.5)
+  sigma_b_2022: 0.063         # annualised bond vol in 2022 (§4.2.5)
+  rho_star: 4.39              # breakeven correlation (Eq 4.5)
+  w_bond_min_var: 0.511       # min-variance bond weight at 2022 vols (Eq 4.4)
+
+portfolio:
+  w_stock_normal: 0.60
+  w_bond_normal:  0.40
+  w_bond_high_inflation: 0.511   # used by regime-switch strategy
+  cpi_naive_threshold: 3.0       # naive rule trigger (Table 4.5)
+  regime_threshold: 4.57         # NN regime label threshold
+
+model1_lstm:
+  seq_len:  12
+  hidden:   64
+  layers:   2
+  dropout:  0.30
+  lr:       0.001
+  epochs:   150
+  batch:    32
+  patience: 20
+
+model2_regime:
+  hidden:   [32, 16]
+  dropout:  0.20
+  lr:       0.0005
+  epochs:   200
+  batch:    32
+
+model3_threshold:
+  hidden:   [64, 32, 16]
+  dropout:  0.20
+  lr:       0.0005
+  epochs:   300
+  batch:    32
+  train_end: "2019-12-31"   # walk-forward split mirrors dissertation §4.3.5
